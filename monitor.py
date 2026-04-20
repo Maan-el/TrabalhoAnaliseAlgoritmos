@@ -8,7 +8,7 @@ from selenium.common.exceptions import WebDriverException
 
 
 # Monitora o elemento selecionado a cada interval_minut minutos e dá trigger na classe Action
-class monitor:
+class Monitor:
 
     def __init__(self, selection, action, interval_minut):
 
