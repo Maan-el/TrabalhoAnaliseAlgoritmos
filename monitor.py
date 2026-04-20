@@ -10,13 +10,16 @@ from selenium.common.exceptions import WebDriverException
 # Monitora o elemento selecionado a cada interval_minut minutos e dá trigger na classe Action
 class Monitor:
 
-    def __init__(self, selection, action, interval_minut):
+    def __init__(self, Selection, Action, interval_minut):
 
-        self.__selection = selection
+        self.__selection = Selection
         self.__interval_sec = interval_minut * 60
-        self.__is_active = True
+        self.__action = Action
+        self.__is_active = False
         self.__last_change = ""
 
+    def start(self):
+        self.resume()
         while self.__is_active:
             try:
 
@@ -30,9 +33,13 @@ class Monitor:
                 driver.get(self.__selection.url)
 
                 element = driver.find_element("xpath", self.__selection.xpath)
+                print(f"Elemento encontrado: {element}")
+                print(f"Elemento selecionado: {self.__selection.conteudo}")
                 if element.text != self.__selection.conteudo:
+                    print("Ativando ação")
                     self.__last_change = element.text
-                    action.trigger()
+                    print(f"Última mudaça reconhecida: {self.__last_change}")
+                    self.__action.trigger()
 
             except NoSuchElementException:
                 print("Erro: O elemento selecionado não foi encontrado na página.")
@@ -46,6 +53,7 @@ class Monitor:
             finally:
                 driver.quit()
 
+            # precisa encontrar uma solução melhor para o sleep
             sleep(self.__interval_sec + randint(0, 2) * 60)
 
     def stop(self):
@@ -58,7 +66,7 @@ class Monitor:
         self.__interval_sec = interval_minut * 60
 
     def __str__(self):
-        return f"Selection: {self.__selection}\nInterval: {self.__interval_sec /60}\nIs active: {self.__is_active}\nLast change: {self.__last_change}\n"
+        return f"Selection: {self.__selection}\nAction: {self.__action}\nInterval: {self.__interval_sec /60}\nIs active: {self.__is_active}\nLast change: {self.__last_change}\n"
 
     @property
     def interval(self):
@@ -75,3 +83,8 @@ class Monitor:
     @property
     def last_change(self):
         return self.__last_change
+
+    @property
+    def action(self):
+        return self.__action
+    
